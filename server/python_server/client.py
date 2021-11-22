@@ -17,20 +17,28 @@ except socket.error as e:
 
 while True:
 
-    # toServer['code'] = "0"
+    MESSAGE = input("Enter code to continue:")
+    toServer['code'] = MESSAGE
 
-    # MESSAGE = input("Enter message to continue:")
+    MESSAGE = input("Enter name:")
+    toServer['name'] = MESSAGE
+
+    if toServer['code'] == "3":
+        MESSAGE = input("Enter roomId:")
+        toServer['rooms'].append({
+            "roomId": int(MESSAGE)
+        })
 
     # toServer['username'] = MESSAGE
 
-    # client.send(ClientMultiSocket, toServer)
+    client.send(ClientMultiSocket, toServer)
 
 
 
-    # response = client.recv(ClientMultiSocket)
+    response = client.recv(ClientMultiSocket)
 
-    # print (response["state"])
-    # print (response["username"])
+    print(response)
+
 
     time.sleep(1)
 

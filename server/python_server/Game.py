@@ -194,6 +194,11 @@ class Game:
         print("x: " + str(x) + "\ty: " + str(y))
 
         self.board.print_board()
+
+    def get_board(self):
+        flatten_board = [str(col) for row in self.board.get_board() for col in row]
+        board = " ".join(flatten_board)
+        return board
         
 
     def get_move(self):
@@ -248,6 +253,8 @@ class Game:
             print("2 wins")
         else:
             print("tie")
+        
+        return [x, y]
 
 
 class BotGame(Game):

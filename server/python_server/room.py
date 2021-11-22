@@ -10,7 +10,7 @@ class Room(object):
     game = None
 
     def __init__(self):
-        self.numPlayer = 1
+        self.numPlayer = 0
         self.state = 1
         self.game = Game()
 
@@ -20,7 +20,7 @@ class Room(object):
     def setNumPlayer(self, num):
         self.numPlayer = num
 
-    def getNumPlayers(self):
+    def getNumPlayer(self):
         return self.numPlayer
 
     def setRoomId(self, roomId):
@@ -36,14 +36,18 @@ class Room(object):
         return self.state
 
     def addPlayer(self, socket, turn, name):
-        p = Players()
-        p.setSocket(socket)
-        p.setTurn(turn)
-        p.setName(name)
-        self.players.append(p)
+        if self.numPlayer < 2:
+            p = Players()
+            p.setSocket(socket)
+            p.setTurn(turn)
+            p.setName(name)
+            self.players.append(p)
+            self.numPlayer +=1
 
     def removePlayer(self, index):
-        self.players.pop(index-1)
+        if self.numPlayer > 0:
+            self.players.pop(index-1)
+            self.numPlayer -= 1
 
     def addSpectator(self, socket, name):
         p = Players()

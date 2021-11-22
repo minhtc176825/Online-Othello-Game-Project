@@ -13,7 +13,7 @@ class Players(object):
         self.game = Game()
         self.socket = 0
         self.turn = 0
-        self.bot = Bot()
+        self.bot = Bot(2)
 
     def getSocket(self):
         return self.socket

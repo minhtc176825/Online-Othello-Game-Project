@@ -2,10 +2,10 @@
 Client ==> Server:
 {
 	"code": "",
+	"name": "",
 	"rooms": [
 		{
 			"roomId": "",
-			"username": "",
 			"moveRow": "",
 			"moveCol": "",
 			"state": "",
@@ -25,7 +25,7 @@ Server ==> Client:
 		{
 			"roomId": "",
 			"currentBoard": "",
-			"currentTurn": "",
+			"clientTurn": "",
 			"nextTurn": "",
 			"user1": "",
 			"user2": "",
