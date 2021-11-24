@@ -70,7 +70,11 @@ Server ==> Client:
 						-> client_quit_room:	"0"
 
 
-7 - play again ( "7 <room_id> <turn>" ) (server -> 	 	if(num_player == 1):
+7 - play again ( "7 <room_id> <turn>" ) (server -> 	 	
+							if(room_id == 0):
+								client -> <board> 4
+							else:
+								if(num_player == 1):
 									client_inside_room + spectators -> "<board> 3 <Name_of_remained_player>"
 								else if(num_player == 2):
 									if(state == 0):

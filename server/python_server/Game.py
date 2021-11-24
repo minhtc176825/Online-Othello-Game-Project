@@ -140,6 +140,8 @@ class Bot:
     def __init__(self, turn):
         self.turn = turn
 
+    def set_turn(self, turn):
+        self.turn = turn
 
     def get_available_moves(self, board):
         moves = []
@@ -199,6 +201,9 @@ class Game:
         flatten_board = [str(col) for row in self.board.get_board() for col in row]
         board = " ".join(flatten_board)
         return board
+
+    def getBoard(self):
+        return self.board
         
 
     def get_move(self):

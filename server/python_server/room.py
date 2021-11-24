@@ -17,6 +17,9 @@ class Room(object):
     def getGame(self):
         return self.game
 
+    def newGame(self):
+        self.game = Game()
+
     def setNumPlayer(self, num):
         self.numPlayer = num
 

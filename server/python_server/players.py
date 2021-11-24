@@ -5,7 +5,7 @@ class Players(object):
     game = None
     bot = None
     socket = 0
-    name = ''
+    name = ""
     turn = 0
     rank = 0
 
@@ -13,7 +13,8 @@ class Players(object):
         self.game = Game()
         self.socket = 0
         self.turn = 0
-        self.bot = Bot(2)
+        self.name = ""
+        self.bot = Bot(0)
 
     def getSocket(self):
         return self.socket
@@ -26,6 +27,7 @@ class Players(object):
 
     def setTurn(self, turn):
         self.turn = turn
+        self.bot.set_turn(3 - turn)
 
     def getName(self):
         return self.name
@@ -47,6 +49,7 @@ class Players(object):
 
     def setBot(self, bot):
         self.bot = bot
+        self.turn = 0
 
     def newGame(self):
         self.game = Game()
