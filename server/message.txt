@@ -1,0 +1,93 @@
+
+Client ==> Server:
+{
+	"code": "",
+	"name": "",
+	"rooms": [
+		{
+			"roomId": "",
+			"moveRow": "",
+			"moveCol": "",
+			"state": "",
+			"turn": ""
+		},
+		{ ... }
+	],
+	"difficulty": ""
+}
+
+
+Server ==> Client:
+{
+	"code": "",
+	"username": "",
+	"rooms": [
+		{
+			"roomId": "",
+			"currentBoard": "",
+			"clientTurn": "",
+			"nextTurn": "",
+			"user1": "",
+			"user2": "",
+			"score1": "",
+			"score2": "",
+			"state": ""
+		},
+		{ ... }
+	]
+}
+		
+
+
+0 - input username 	( "0 <username>" ) (server -> client: "1"/"0")
+			( "0" ) (server -> client:"<username>")
+
+
+1 - refresh live matches/search rooms by host's name ( "1 (name)" ) (server -> client: "<room_id1> <Score1> <Score2>,<room_id2> <Score3> <Score4>, ..")
+
+2 - create room ( "2 <username>" ) (server -> client: "<board> <room_id> 1")
+
+3 - join room ( "3 <room_id> <username>") (server ->  	user1: "<user2>"
+					  		user2: "<board> 2"
+							spectators: "<current_board> <current_turn> <user1> <user2> <score1> <score2>"
+
+4 - start game ( "4 <room_id>" ) (server ->  if (room_id == '0') : ("<board> <turn> <score1> <score2>")
+					     else:
+ 						2 clients: "<board> <turn> <user1> <user2> <score1> <score2>"
+
+5 - move ( "5 <room_id> <move_row> <move_col>") (server -> if (room_id == '0') : ("<board> <turn> <score1> <score2>")
+							   else:
+								2 clients: "<board> <turn> <user1> <user2> <score1> <score2>"
+								spectators: "<current_board> <current_turn> <user1> <user2> <score1> <score2>"
+
+
+6 - quit game ( "6 <room_id> <state>" ) (server -> client_inside_room + spectators: if(num_player == 2):
+											if (state == true)  -> ( "<board> -2 <Name_of_remained_player> # 1 0" )
+											if (state == false) -> ( "<board> 0" )
+										    else:
+											spectators: "empty"
+
+						-> client_quit_room:	"0"
+
+
+7 - play again ( "7 <room_id> <turn>" ) (server -> 	 	
+							if(room_id == 0):
+								client -> <board> 4
+							else:
+								if(num_player == 1):
+									client_inside_room + spectators -> "<board> 3 <Name_of_remained_player>"
+								else if(num_player == 2):
+									if(state == 0):
+										2 clients + spectators  -> "<board> 0"
+									else if(state == 1):
+										if (turn == 1)  -> ( "<board> 2" )
+										if (turn == 2)  -> ( "<board> 1" )
+                          			   				spectators 	->  "<board>"
+
+
+8 - spectator out game ( "8 <room_id>" ) (server -> client: "0")
+
+
+9 - play with bot ( "9 <difficulty>" ) 	if(difficulty == 0) : ( "0" )  //exit bot
+					else : (server -> client: "<board> 1" )
+					
