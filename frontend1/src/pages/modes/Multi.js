@@ -15,12 +15,14 @@ import { useHistory } from "react-router";
 import { Input } from "@chakra-ui/input";
 import { Button } from "@chakra-ui/button";
 import { useToast } from "@chakra-ui/toast";
+import { socket } from "../../connection/socket";
 
 const Multi = () => {
   const toast = useToast();
   const history = useHistory();
   const user = JSON.parse(localStorage.getItem("userInfo"));
   const [rooms, setRooms] = useState();
+  const [roomId, setRoomId] = useState();
 
   useEffect(() => {
     fetchRooms();
@@ -50,8 +52,7 @@ const Multi = () => {
   };
 
   const joinRoom = async (roomID) => {
-    console.log("joi room");
-    console.log(roomID);
+    console.log("join room");
 
     try {
       const config = {
@@ -60,19 +61,43 @@ const Multi = () => {
         },
       };
 
-      const { data } = await axios.put(
-        `http://127.0.0.1:8000/api/v1/room/${roomID}`,
-        config
-      );
-      console.log("joined room");
+      const { data } = await axios.put(`api/v1/room/${roomID}`, config);
+      socket.emit("join game", data);
+      history.replace("/game/", { room: data, user: user });
     } catch (error) {
       toast({
         title: "Error Occured!",
-        description: "Failed to join the rooms",
+        description: "Failed to join the room",
         status: "error",
         duration: 5000,
         isClosable: true,
-        position: "bottom-left",
+        position: "bottom",
+      });
+    }
+  };
+
+  const createNewRoom = async () => {
+    console.log("create room");
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.post("/api/v1/room", config);
+      console.log(data);
+      console.log(`created room ${data._id}`);
+      socket.emit("create", data);
+      history.replace("/game", { room: data, user: user });
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: "Failed to create new room",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
       });
     }
   };
@@ -99,13 +124,32 @@ const Multi = () => {
         d="flex"
         marginTop="10px"
         marginBottom="50px"
-        w="30%"
-        justifyContent="space-between"
+        justifyContent="center"
+        w="100%"
       >
-        <Input placeholder="Enter Room ID" bg="white" maxW="80%" />
-        <Button colorScheme="teal" variant="solid" w="15%">
-          Join
-        </Button>
+        <Input
+          placeholder="Enter Room ID"
+          bg="white"
+          w="50%"
+          onChange={(e) => setRoomId(e.target.value)}
+        />
+        <Box marginLeft="20px">
+          <Button
+            colorScheme="teal"
+            variant="solid"
+            marginRight="20px"
+            onClick={() => joinRoom(roomId)}
+          >
+            Join
+          </Button>
+          <Button
+            colorScheme="teal"
+            variant="solid"
+            onClick={(e) => createNewRoom(e)}
+          >
+            Create
+          </Button>
+        </Box>
       </Box>
 
       <Table

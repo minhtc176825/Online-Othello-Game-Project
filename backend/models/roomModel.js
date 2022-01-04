@@ -13,6 +13,22 @@ const roomSchema = mongoose.Schema(
         state: {
             type: "Number",
             default: 0
+        },
+        // board: {
+        //     type: "String",
+        //     default: "0000000000000000000000000000000000000000000000000000000000000000"
+        // },
+        board: [{
+            type: "Number",
+            default: 0
+        }],
+        score: [{
+            type: "Number",
+            default: 2
+        }],
+        turn: {
+            type: "Number",
+            default: 1
         }
     },
     {

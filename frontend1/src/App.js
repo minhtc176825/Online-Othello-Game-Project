@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Main from "./pages/Main";
 import Single from "./pages/modes/Single";
 import Multi from "./pages/modes/Multi";
+import Game from "./pages/Game";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path="/main" component={Main} />
       <Route path="/single" component={Single} />
       <Route path="/multi" component={Multi} />
+      <Route path="/game" component={Game} />
     </div>
   );
 }
