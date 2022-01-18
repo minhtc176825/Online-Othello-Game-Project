@@ -1,3 +1,9 @@
 # Online-Othello-Game-Project
 
-Please switch to branch develop to see the progress of the project
+## Backend
+
+`docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d`
+
+## Frontend
+
+`npm start`
