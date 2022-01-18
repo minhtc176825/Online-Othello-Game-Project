@@ -1,24 +1,20 @@
 const express = require("express");
-const {
-  getAllRooms,
-  createNewRoom,
-  joinRoom,
-  getRoom,
-  updateBoard,
-} = require("../controllers/roomController");
-const protect = require("../middleware/authMiddleware");
 
+const roomController = require("../controllers/roomController");
+const protect = require("../middleware/authMiddleware");
 const router = express.Router();
 
-router.get("/", protect, getAllRooms);
-router.post("/", protect, createNewRoom);
-router.put("/:id", protect, joinRoom);
-router.get("/:id", protect, getRoom);
-router.patch("/:id", protect, updateBoard);
-// router.route("/").post(protect, createNewRoom);
-// router.route("/").get(protect, getAllRooms);
+router
+  .route("/")
+  .get(protect, roomController.fetchRooms)
+  .post(protect, roomController.createNewRoom);
 
-// router.route("/:id").put(protect, joinRoom);
-// router.route("/:id").get(protect, getRoom);
+router
+  .route("/:id")
+  .get(protect, roomController.getRoom)
+  .patch(protect, roomController.updateRoom)
+  .delete(protect, roomController.deleteRoom);
+
+router.route("/join/:id").patch(protect, roomController.joinRoom);
 
 module.exports = router;

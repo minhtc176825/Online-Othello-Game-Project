@@ -1,42 +1,49 @@
-const asyncHandler = require("express-async-handler");
 const Room = require("../models/roomModel");
-const User = require("../models/userModel");
 
-// status
-// = 0 : READY
-// = 1 : ONGOING
-// = 2 : DONE
-const getAllRooms = asyncHandler(async (req, res) => {
-  console.log("GET /api/v1/room/");
-
+exports.fetchRooms = async (req, res, next) => {
   try {
-    const rooms = await Room.find({
-      $or: [
-        { state: 0 },
-        { state: 1 },
-      ],
-    })
+    const rooms = await Room.find()
       .populate("users", "-password")
       .populate("host", "-password");
 
-    res.status(200).json(rooms);
-  } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(200).json({
+      status: "SUCCESS",
+      results: rooms.length,
+      data: {
+        rooms,
+      },
+    });
+  } catch (e) {
+    res.status(400).json({
+      status: "FAIL",
+    });
   }
-});
+};
 
-const createNewRoom = asyncHandler(async (req, res) => {
-  console.log("POST /api/v1/room/");
+exports.getRoom = async (req, res, next) => {
+  try {
+    const room = await Room.findById(req.params.id)
+      .populate("users", "-password")
+      .populate("host", "-password");
 
-  var tmp = JSON.stringify([]);
-  var users = JSON.parse(tmp);
+    res.status(200).json({
+      status: "SUCCESS",
+      data: {
+        room,
+      },
+    });
+  } catch (e) {
+    res.status(400).json({
+      status: "FAIL",
+    });
+  }
+};
 
-  users.push(req.user);
+exports.createNewRoom = async (req, res, next) => {
+  console.log("POST /api/v1/rooms");
 
-  var board = [];
-  var score = [2, 2];
-
+  const user = req.session.user;
+  let board = [];
   for (var i = 0; i < 64; i++) {
     if (i == 27 || i == 36) {
       board.push(1);
@@ -47,95 +54,71 @@ const createNewRoom = asyncHandler(async (req, res) => {
     }
   }
 
+  let score = [2, 2];
+
   try {
     const newRoom = await Room.create({
-      users: users,
-      host: req.user,
+      users: [user],
+      host: user,
       board: board,
       score: score,
-      state: 0
     });
 
     const room = await Room.findOne({ _id: newRoom._id })
       .populate("users", "-password")
       .populate("host", "-password");
 
-    // console.log(room);
-    res.status(200).json(room);
-  } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(200).json({
+      status: "SUCCESS",
+      data: {
+        room,
+      },
+    });
+  } catch (e) {
+    res.status(400).json({
+      status: "FAIL",
+    });
   }
-});
-
-const joinRoom = asyncHandler(async (req, res) => {
-  console.log("PUT /api/v1/room/:id");
-  const roomID = req.params.id;
-
-  const room = await Room.findOne({ _id: roomID });
-
-  var users = room.users;
-  users.push(req.user);
-
-  const updatedRoom = await Room.findByIdAndUpdate(
-    roomID,
-    {
-      users: users,
-      state: 1
-    },
-    {
-      new: true,
-    }
-  )
-    .populate("users", "-password")
-    .populate("host", "-password");
-
-  if (updatedRoom) {
-    // console.log(updatedRoom);
-    res.status(201).json(updatedRoom);
-  }
-});
-
-const updateBoard = asyncHandler(async (req, res) => {
-  console.log("PATCH /api/v1/room/:id");
-  const roomID = req.params.id;
-
-  console.log(req.body)
-
-  const updatedRoom = await Room.findByIdAndUpdate(
-    roomID,
-    {
-      board: req.body.board,
-      turn: req.body.turn
-    },
-  ).populate("users", "-password")
-  .populate("host", "-password");
-
-  if (updatedRoom) {
-    console.log(updatedRoom)
-    res.status(201).json(updatedRoom);
-  }
-})
-
-const getRoom = asyncHandler(async (req, res) => {
-  const roomID = req.params.id;
-  console.log(roomID);
-  const room = await Room.findOne({ _id: roomID })
-    .populate("users", "-password")
-    .populate("host", "-password");
-
-  if (room) {
-    res.status(201).send(room);
-  } else {
-    res.status(400);
-    throw new Error("Room not exists");
-  }
-});
-
-module.exports = {
-  getAllRooms,
-  createNewRoom,
-  joinRoom,
-  getRoom,
-  updateBoard
 };
+
+exports.joinRoom = async (req, res, next) => {
+  console.log("PATCH /api/v1/rooms/join/:id");
+
+  const user = req.session.user;
+
+  try {
+    const room = await Room.findById(req.params.id);
+    console.log(room);
+    const users = room.users;
+    users.push(user);
+    console.log(users);
+    const newRoom = await Room.findByIdAndUpdate(
+      req.params.id,
+      {
+        users: users,
+        state: "READY",
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+      .populate("users", "-password")
+      .populate("host", "-password");
+
+    res.status(200).json({
+      status: "SUCCESS",
+      data: {
+        newRoom,
+      },
+    });
+  } catch (e) {
+    res.status(400).json({
+      status: "FAIL",
+    });
+  }
+};
+
+exports.updateRoom = async (req, res, next) => {};
+
+exports.deleteRoom = async (req, res, next) => {};
