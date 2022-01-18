@@ -22,6 +22,7 @@ const Game = (props) => {
   const [endpoint, setEndpoint] = useState("http://localhost:8000");
   const [showStart, setShowStart] = useState(false);
   const [level, setLevel] = useState(0);
+  const [winner, setWinner] = useState();
 
   useEffect(() => {
     console.log("only one");
@@ -67,6 +68,14 @@ const Game = (props) => {
         setCurrentTurn(data.currentTurn);
         setState("PLAYING");
         setShowStart(false);
+        console.log(`turn: ${turn}`);
+        if (data.currentTurn === turn) {
+          socket.emit("GET MOVES", {
+            board: data.board,
+            roomId: roomId,
+            currentTurn: data.currentTurn,
+          });
+        }
       });
 
       socket.on("MOVE", (data) => {
@@ -99,9 +108,24 @@ const Game = (props) => {
         setBoard(data.board);
         setScore(data.score);
 
-        if (data.board.filter((square) => square === -1 || square === 0).length === 0) {
+        if (
+          data.board.filter((square) => square === -1 || square === 0)
+            .length === 0
+        ) {
           setState("FINISH");
         }
+      });
+
+      socket.on("USER LEFT", (data) => {
+        console.log("user left");
+
+        // setUsers(data.users);
+        // console.log(data);
+        setWinner(data.users.username);
+
+        setState("FINISH");
+
+        console.log(users);
       });
     }
   }, [initComponent]);
@@ -163,6 +187,16 @@ const Game = (props) => {
     setState("WAITING");
   };
 
+  const handleQuitRoom = async () => {
+    socket.emit("QUIT ROOM", { roomId: roomId, users: users, isHost: isHost });
+
+    if (state === "FINISH" || state == "WAITING") {
+      const { data } = await axios.delete(`/api/v1/rooms/${roomId}`);
+    }
+
+    history.replace("/multi");
+  };
+
   return (
     <Container maxW="100%" maxH="100%" p={5} centerContent d="flex">
       <Box
@@ -200,9 +234,9 @@ const Game = (props) => {
           w="20px"
           border="1px"
         ></Box>
-        {users.length == 2 ? (
+        {users?.length == 2 ? (
           <Text fontFamily="Work sans" fontSize="xl">
-            {users[0].username}{" "}
+            {users[0]?.username}{" "}
             <strong>
               {score[0]} - {score[1]}
             </strong>{" "}
@@ -300,13 +334,18 @@ const Game = (props) => {
           border="2px"
           borderColor="green"
         >
-          {score[0] > score[1] ? (
+          {}
+          {winner ? (
             <Text fontFamily="Work sans" fontSize="3xl">
-              {users[0].username} won
+              {winner} won
+            </Text>
+          ) : score[0] > score[1] ? (
+            <Text fontFamily="Work sans" fontSize="3xl">
+              {users[0]?.username} won
             </Text>
           ) : score[0] < score[1] ? (
             <Text fontFamily="Work sans" fontSize="3xl">
-              {users[1] ? users[1].username : ""} won
+              {users[1] ? users[1]?.username : ""} won
             </Text>
           ) : (
             <Text fontFamily="Work sans" fontSize="3xl">
@@ -319,7 +358,7 @@ const Game = (props) => {
             alignItems="center"
             w="100%"
           >
-            <Button
+            {/* <Button
               colorScheme="green"
               variant="solid"
               onClick={() => playAgain()}
@@ -327,11 +366,11 @@ const Game = (props) => {
               <Text fontFamily="Work sans" fontSize="2xl">
                 Play again
               </Text>
-            </Button>
+            </Button> */}
             <Button
               colorScheme="green"
               variant="solid"
-              onClick={() => setState("WAITING")}
+              onClick={() => handleQuitRoom()}
             >
               <Text fontFamily="Work sans" fontSize="2xl">
                 Quit
@@ -372,7 +411,7 @@ const Game = (props) => {
         </Grid>
       </Box>
       <Box marginTop="5px">
-        <Button>
+        <Button onClick={() => handleQuitRoom()}>
           <Text fontFamily="Work sans" fontSize="xl">
             Quit
           </Text>

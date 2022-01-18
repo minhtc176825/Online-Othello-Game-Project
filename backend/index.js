@@ -122,16 +122,14 @@ io.on("connection", (socket) => {
     game.get_board().set_available_moves(data.turn);
 
     count = 0;
-    for (var i = 0; i < 8; i++) {
-      for (var j = 0; j < 8; j++) {
-        data.board[count] = game.get_board().board[i][j];
-        count++;
-      }
-    }
+
 
     data.currentTurn = game.get_turn();
-    console.log(game.get_board().board);
-    socket.emit("START", { board: data.board, currentTurn: data.currentTurn });
+
+    io.in(data.roomId).emit("START", {
+      board: data.board,
+      currentTurn: data.currentTurn
+    });
   });
 
   socket.on("MOVE", (data) => {
@@ -328,5 +326,13 @@ io.on("connection", (socket) => {
       currentTurn: data.currentTurn,
       score: [score1, score2],
     });
+  });
+
+  socket.on("QUIT ROOM", (data) => {
+    socket.leave(data.roomId);
+    const user1 = data.users[0];
+    const user2 = data.users[1];
+    const winner = data.isHost ? user2 : user1;
+    socket.to(data.roomId).emit("USER LEFT", {users: winner});
   });
 });

@@ -41,7 +41,7 @@ const Multi = () => {
     console.log(data);
     const roomId = data.data.room._id;
     socket.emit("CREATE", roomId);
-    history.push("/game", { roomId: roomId, isHost: true });
+    history.replace("/game", { roomId: roomId, isHost: true });
   };
 
   const joinRoom = async (roomId) => {
@@ -52,7 +52,7 @@ const Multi = () => {
       console.log(data);
       const room_id = data.data.newRoom._id;
       socket.emit("JOIN", room_id);
-      history.push("/game", { roomId: room_id });
+      history.replace("/game", { roomId: room_id });
   };
 
   return (
@@ -79,6 +79,7 @@ const Multi = () => {
         justifyContent="center"
         w="100%"
       >
+        <Button colorScheme="teal" variant="solid" marginRight="10px" onClick={() => history.goBack()}>Back to main</Button>
         <Input
           placeholder="Enter Room ID"
           bg="white"
@@ -102,6 +103,7 @@ const Multi = () => {
             Create
           </Button>
         </Box>
+
       </Box>
 
       <Table

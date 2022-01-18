@@ -11,6 +11,14 @@ const Single = () => {
     history.push("/game", { level: 1});
   };
 
+  const mediumMode = () => {
+    history.push("/game", { level: 2});
+  }
+
+  const hardMode = () => {
+    history.push("/game", { level: 3});
+  }
+
   return (
     <Container maxW="100%" maxH="100%" p={5} centerContent>
       <Box
@@ -42,17 +50,17 @@ const Single = () => {
               Easy
             </Text>
           </Button>
-          <Button w="60%" h="100px">
+          <Button w="60%" h="100px" onClick={() => mediumMode()}>
             <Text fontSize="4xl" fontFamily="Work sans">
               Medium
             </Text>
           </Button>
-          <Button w="60%" h="100px">
+          <Button w="60%" h="100px" onClick={() => hardMode()}>
             <Text fontSize="4xl" fontFamily="Work sans">
               Hard
             </Text>
           </Button>
-          <Button w="60%" h="100px">
+          <Button w="60%" h="100px" onClick={() => history.goBack()}>
             <Text fontSize="2xl" fontFamily="Work sans">
               Back to Menu
             </Text>

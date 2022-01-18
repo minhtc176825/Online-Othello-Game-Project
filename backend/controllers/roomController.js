@@ -121,4 +121,18 @@ exports.joinRoom = async (req, res, next) => {
 
 exports.updateRoom = async (req, res, next) => {};
 
-exports.deleteRoom = async (req, res, next) => {};
+exports.deleteRoom = async (req, res, next) => {
+  console.log("PATCH /api/v1/rooms/join/:id");
+
+  try {
+    const room = await Room.findByIdAndDelete(req.params.id).populate("users", "-password").populate("host", "-password");
+
+    res.status(200).json({
+      status: "DELETED"
+    });
+  } catch (e) {
+    res.status(400).json({
+      status: "FAIL"
+    });
+  }
+};
