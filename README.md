@@ -1,9 +1,10 @@
 # Online-Othello-Game-Project
 
-## Backend
+## Setup
+In directory backend: ``` docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d ```
 
-`docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d`
+In directory frontend: ```npm install ```
 
-## Frontend
+## Run project
 
-`npm start`
+In directory frontend: ``` npm start ```
